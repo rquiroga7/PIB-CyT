@@ -264,15 +264,6 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zer
     bg = "white"
   )
   
-  # Guardar en PDF
-  ggsave(
-    paste0(filename_base, ".pdf"),
-    plot = p,
-    width = 12,
-    height = 12,
-    bg = "white"
-  )
-  
   return(p)
 }
 
