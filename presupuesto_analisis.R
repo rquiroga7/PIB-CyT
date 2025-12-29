@@ -99,8 +99,8 @@ colores_gobierno <- c(
 gobiernos_rect <- presupuesto %>%
   group_by(Gobierno) %>%
   summarise(
-    xmin = ifelse(Gobierno=="Menem\n(1989-1999)", min(Año), min(Año)-.5),
-    xmax = max(Año)+.5,
+    xmin = ifelse(Gobierno=="Menem\n(1989-1999)", min(Año), min(Año)-.8),
+    xmax = max(Año)+.2,
     .groups = "drop"
   ) %>%
   filter(!is.na(Gobierno))
@@ -141,7 +141,7 @@ caption_text <- paste0(
 # 6. Función para crear gráficos
 # -----------------------------------------------------------------------------
 
-crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
+crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zero = FALSE) {
   # Preparar datos
   datos_plot <- data %>%
     select(Año, Gobierno, valor = all_of(variable))
@@ -164,7 +164,7 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
     scale_fill_manual(values = colores_gobierno, guide = "none") +
     # Agregar líneas verticales entre gobiernos
     geom_vline(
-      xintercept = c(1999.5, 2001.5, 2003.5, 2007.5, 2015.5, 2019.5, 2023.5),
+      xintercept = c(1999.2, 2001.2, 2003.2, 2007.2, 2015.2, 2019.2, 2023.2),
       linetype = "dashed",
       color = "gray50",
       alpha = 0.5
@@ -206,10 +206,6 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
       breaks = seq(1993, 2026, by = 2),
       limits = c(1992.5, 2026.5)
     ) +
-    scale_y_continuous(
-      labels = function(x) paste0(x, "%"),
-      expand = expansion(mult = c(0.05, 0.15))
-    ) +
     # Títulos y etiquetas
     labs(
       title = titulo,
@@ -223,7 +219,7 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
     # Agregar etiquetas de gobierno en la parte superior (alternando posiciones y)
     annotate(
       "text",
-      x = c(1996.5, 2002.5, 2011.5, 2021.5),
+      x = c(1996.2, 2002.2, 2011.2, 2021.2),
       y = Inf,
       label = c("Menem", "Duhalde", "CFK", "Fernández"),
       vjust = 2,
@@ -234,7 +230,7 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
     ) +
     annotate(
       "text",
-      x = c(2000.5, 2005.5, 2017.5, 2025),
+      x = c(2000.2, 2005.2, 2017.2, 2025),
       y = Inf,
       label = c("De la Rúa", "Kirchner", "Macri", "Milei"),
       vjust = 6,
@@ -243,6 +239,20 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
       fontface = "bold",
       color = "gray30"
     )
+  
+  # Configurar escala Y según parámetro
+  if (start_y_zero) {
+    p <- p + scale_y_continuous(
+      labels = function(x) paste0(x, "%"),
+      expand = expansion(mult = c(0, 0.15)),
+      limits = c(0, NA)
+    )
+  } else {
+    p <- p + scale_y_continuous(
+      labels = function(x) paste0(x, "%"),
+      expand = expansion(mult = c(0.05, 0.15))
+    )
+  }
   
   # Guardar en PNG
   ggsave(
@@ -270,6 +280,7 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
 # 7. Crear y guardar los gráficos
 # -----------------------------------------------------------------------------
 
+# Gráficos con escala Y automática
 p_ciencia <- crear_grafico_pbi(
   data = presupuesto,
   variable = "Ciencia_pct_PBI",
@@ -284,9 +295,28 @@ p_educacion <- crear_grafico_pbi(
   filename_base = "presupuesto_educacion_pbi"
 )
 
+# Gráficos con escala Y comenzando en 0
+p_ciencia_y0 <- crear_grafico_pbi(
+  data = presupuesto,
+  variable = "Ciencia_pct_PBI",
+  titulo = "Presupuesto Devengado en Ciencia y Técnica como % del PBI",
+  filename_base = "presupuesto_ciencia_pbi_y0",
+  start_y_zero = TRUE
+)
+
+p_educacion_y0 <- crear_grafico_pbi(
+  data = presupuesto,
+  variable = "Educacion_pct_PBI",
+  titulo = "Presupuesto Devengado en Educación como % del PBI",
+  filename_base = "presupuesto_educacion_pbi_y0",
+  start_y_zero = TRUE
+)
+
 # Mostrar los gráficos
 print(p_ciencia)
 print(p_educacion)
+print(p_ciencia_y0)
+print(p_educacion_y0)
 
 # -----------------------------------------------------------------------------
 # 8. Imprimir resumen de datos
