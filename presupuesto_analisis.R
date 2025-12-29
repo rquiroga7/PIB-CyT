@@ -134,7 +134,9 @@ caption_text <- paste0(
   "Fuentes: Presupuesto histórico (economia.gob.ar/onp/documentos/series/Serie6506.pdf) | ",
   "PBI 1993-2004 (INDEC, cuadro8_1.xls) | PBI 2004-2025 (INDEC, sh_oferta_demanda_12_25.xls)\n",
   "Devengados (presupuestoabierto.gob.ar/sici/datos-abiertos) | ",
-  "Nota: PBI 2025-2026 corresponde a estimaciones del Presupuesto Nacional 2026"
+  "PBI 2025-2026: estimaciones del Presupuesto Nacional 2026\n",
+  "Nota: 2025 usa devengado al 29/12/2024. 2026 usa el presupuesto como estimación proyectada.\n",
+  "Gráfico: Rodrigo Quiroga | Repositorio: github.com/rquiroga7/PIB-CyT"
 )
 
 # -----------------------------------------------------------------------------
@@ -327,9 +329,9 @@ crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base) {
     geom_label(
       data = gobierno_labels_row1,
       aes(x = x_pos, y = Inf, label = label, fill = Gobierno),
-      vjust = 1.5,
+      vjust = 1.2,
       hjust = 0.5,
-      size = 4,
+      size = 5,
       fontface = "bold",
       color = "black",
       label.size = 0.3,
@@ -339,9 +341,9 @@ crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base) {
     geom_label(
       data = gobierno_labels_row2,
       aes(x = x_pos, y = Inf, label = label, fill = Gobierno),
-      vjust = 3.5,
+      vjust = 2.8,
       hjust = 0.5,
-      size = 4,
+      size = 5,
       fontface = "bold",
       color = "black",
       label.size = 0.3,
@@ -349,7 +351,7 @@ crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base) {
     ) +
     # Escalas de los ejes
     scale_x_continuous(
-      breaks = seq(1993, 2026, by = 2),
+      breaks = seq(1993, 2026, by = 1),
       limits = c(1992.5, 2026.5)
     ) +
     scale_y_continuous(
