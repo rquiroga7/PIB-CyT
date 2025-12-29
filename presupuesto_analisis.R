@@ -268,6 +268,120 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zer
 }
 
 # -----------------------------------------------------------------------------
+# 6b. Función para crear gráficos de barras
+# -----------------------------------------------------------------------------
+
+crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base) {
+  # Preparar datos
+  datos_plot <- data %>%
+    select(Año, Gobierno, valor = all_of(variable))
+  
+  # Filtrar solo el último año de cada gobierno para las etiquetas
+  datos_labels <- datos_plot %>%
+    group_by(Gobierno) %>%
+    filter(Año == max(Año)) %>%
+    ungroup()
+  
+  # Crear datos para etiquetas de gobierno (posición central de cada gobierno)
+  # Dividir en dos grupos para alternar posiciones verticales
+  gobierno_labels_row1 <- data %>%
+    group_by(Gobierno) %>%
+    summarise(x_pos = mean(Año), .groups = "drop") %>%
+    filter(!is.na(Gobierno)) %>%
+    slice(c(1, 3, 5, 7)) %>%  # Menem, Duhalde, CFK, Fernández
+    mutate(label = c("Menem", "Duhalde", "CFK", "Fernández"))
+  
+  gobierno_labels_row2 <- data %>%
+    group_by(Gobierno) %>%
+    summarise(x_pos = mean(Año), .groups = "drop") %>%
+    filter(!is.na(Gobierno)) %>%
+    slice(c(2, 4, 6, 8)) %>%  # De la Rúa, Kirchner, Macri, Milei
+    mutate(label = c("De la Rúa", "Kirchner", "Macri", "Milei"))
+  
+  # Crear el gráfico
+  p <- ggplot() +
+    # Agregar barras con color de gobierno
+    geom_col(
+      data = datos_plot,
+      aes(x = Año, y = valor, fill = Gobierno),
+      color = "black",
+      width = 0.7,
+      show.legend = FALSE
+    ) +
+    scale_fill_manual(values = colores_gobierno) +
+    # Agregar etiquetas de datos rotadas
+    geom_label(
+      data = datos_labels,
+      aes(x = Año, y = valor, label = sprintf("%.2f%%", valor), fill = Gobierno),
+      size = 4,
+      color = "black",
+      fontface = "bold",
+      label.size = 0.3,
+      label.padding = unit(0.15, "lines"),
+      vjust = 0.5,
+      hjust = -0.1,
+      angle = 90,
+      show.legend = FALSE
+    ) +
+    # Agregar etiquetas de gobierno en la parte superior (fila 1)
+    geom_label(
+      data = gobierno_labels_row1,
+      aes(x = x_pos, y = Inf, label = label, fill = Gobierno),
+      vjust = 1.5,
+      hjust = 0.5,
+      size = 4,
+      fontface = "bold",
+      color = "black",
+      label.size = 0.3,
+      show.legend = FALSE
+    ) +
+    # Agregar etiquetas de gobierno en la parte superior (fila 2)
+    geom_label(
+      data = gobierno_labels_row2,
+      aes(x = x_pos, y = Inf, label = label, fill = Gobierno),
+      vjust = 3.5,
+      hjust = 0.5,
+      size = 4,
+      fontface = "bold",
+      color = "black",
+      label.size = 0.3,
+      show.legend = FALSE
+    ) +
+    # Escalas de los ejes
+    scale_x_continuous(
+      breaks = seq(1993, 2026, by = 2),
+      limits = c(1992.5, 2026.5)
+    ) +
+    scale_y_continuous(
+      labels = function(x) paste0(x, "%"),
+      expand = expansion(mult = c(0, 0.15)),
+      limits = c(0, NA)
+    ) +
+    # Títulos y etiquetas
+    labs(
+      title = titulo,
+      subtitle = "Argentina 1993-2026 | Por período de gobierno",
+      x = "Año",
+      y = "Porcentaje del PBI",
+      caption = caption_text
+    ) +
+    # Aplicar tema
+    tema_profesional
+  
+  # Guardar en PNG
+  ggsave(
+    paste0(filename_base, ".png"),
+    plot = p,
+    width = 12,
+    height = 12,
+    dpi = 300,
+    bg = "white"
+  )
+  
+  return(p)
+}
+
+# -----------------------------------------------------------------------------
 # 7. Crear y guardar los gráficos
 # -----------------------------------------------------------------------------
 
@@ -308,6 +422,24 @@ print(p_ciencia)
 print(p_educacion)
 print(p_ciencia_y0)
 print(p_educacion_y0)
+
+# Gráficos de barras
+p_ciencia_bar <- crear_grafico_barras_pbi(
+  data = presupuesto,
+  variable = "Ciencia_pct_PBI",
+  titulo = "Presupuesto Devengado en Ciencia y Técnica como % del PBI",
+  filename_base = "presupuesto_ciencia_pbi_bar"
+)
+
+p_educacion_bar <- crear_grafico_barras_pbi(
+  data = presupuesto,
+  variable = "Educacion_pct_PBI",
+  titulo = "Presupuesto Devengado en Educación como % del PBI",
+  filename_base = "presupuesto_educacion_pbi_bar"
+)
+
+print(p_ciencia_bar)
+print(p_educacion_bar)
 
 # -----------------------------------------------------------------------------
 # 8. Imprimir resumen de datos
