@@ -138,237 +138,150 @@ caption_text <- paste0(
 )
 
 # -----------------------------------------------------------------------------
-# 6a. Gráfico de CIENCIA
+# 6. Función para crear gráficos
 # -----------------------------------------------------------------------------
 
-datos_ciencia <- presupuesto %>%
-  select(Año, Gobierno, Ciencia_pct_PBI)
+crear_grafico_pbi <- function(data, variable, titulo, filename_base) {
+  # Preparar datos
+  datos_plot <- data %>%
+    select(Año, Gobierno, valor = all_of(variable))
+  
+  # Filtrar solo el último año de cada gobierno para las etiquetas
+  datos_labels <- datos_plot %>%
+    group_by(Gobierno) %>%
+    filter(Año == max(Año)) %>%
+    ungroup()
+  
+  # Crear el gráfico
 
-p_ciencia <- ggplot() +
-  # Agregar rectángulos de fondo para cada gobierno
-  geom_rect(
-    data = gobiernos_rect,
-    aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = Gobierno),
-    alpha = 0.3
-  ) +
-  scale_fill_manual(values = colores_gobierno, guide = "none") +
-  # Agregar líneas verticales entre gobiernos
-  geom_vline(
-    xintercept = c(1999.5, 2001.5, 2003.5, 2007.5, 2015.5, 2019.5, 2023.5),
-    linetype = "dashed",
-    color = "gray50",
-    alpha = 0.5
-  ) +
-  # Agregar línea de la serie temporal
-  geom_line(
-    data = datos_ciencia,
-    aes(x = Año, y = Ciencia_pct_PBI),
-    color = "#2E86AB",
-    linewidth = 1.2
-  ) +
-  # Agregar puntos
-  geom_point(
-    data = datos_ciencia,
-    aes(x = Año, y = Ciencia_pct_PBI),
-    color = "#2E86AB",
-    size = 3
-  ) +
-  # Agregar etiquetas con contorno blanco
-  geom_label_repel(
-    data = datos_ciencia,
-    aes(x = Año, y = Ciencia_pct_PBI, label = sprintf("%.2f%%", Ciencia_pct_PBI)),
-    size = 5,
-    color = "#2E86AB",
-    fill = "white",
-    label.size = 0.2,
-    label.padding = unit(0.15, "lines"),
-    max.overlaps = 25,
-    segment.size = 0.3,
-    segment.alpha = 0.5,
-    box.padding = 0.4,
-    point.padding = 0.3,
-    force_pull = 0,
-    direction = "y"
-  ) +
-  # Escalas de los ejes
-  scale_x_continuous(
-    breaks = seq(1993, 2026, by = 2),
-    limits = c(1992.5, 2026.5)
-  ) +
-  scale_y_continuous(
-    labels = function(x) paste0(x, "%"),
-    expand = expansion(mult = c(0.05, 0.15))
-  ) +
-  # Títulos y etiquetas
-  labs(
-    title = "Presupuesto Devengado en Ciencia y Técnica como % del PBI",
-    subtitle = "Argentina 1993-2026 | Por período de gobierno",
-    x = "Año",
-    y = "Porcentaje del PBI",
-    caption = caption_text
-  ) +
-  # Aplicar tema
-  tema_profesional +
-  # Agregar etiquetas de gobierno en la parte superior (alternando posiciones y)
-  annotate(
-    "text",
-    x = c(1996, 2002, 2011, 2021),
-    y = Inf,
-    label = c("Menem", "Duhalde", "CFK", "Fernández"),
-    vjust = 2,
-    hjust=0.5,
-    size = 4,
-    fontface = "bold",
-    color = "gray30"
-  ) +
-  annotate(
-    "text",
-    x = c(2000, 2005, 2017, 2024.5),
-    y = Inf,
-    label = c("De la Rúa", "Kirchner", "Macri", "Milei"),
-    vjust = 4,
-    hjust=0.5,
-    size = 4,
-    fontface = "bold",
-    color = "gray30"
+  p <- ggplot() +
+    # Agregar rectángulos de fondo para cada gobierno
+    geom_rect(
+      data = gobiernos_rect,
+      aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = Gobierno),
+      alpha = 0.3
+    ) +
+    scale_fill_manual(values = colores_gobierno, guide = "none") +
+    # Agregar líneas verticales entre gobiernos
+    geom_vline(
+      xintercept = c(1999.5, 2001.5, 2003.5, 2007.5, 2015.5, 2019.5, 2023.5),
+      linetype = "dashed",
+      color = "gray50",
+      alpha = 0.5
+    ) +
+    # Agregar línea de la serie temporal
+    geom_line(
+      data = datos_plot,
+      aes(x = Año, y = valor),
+      color = "black",
+      linewidth = 1.2
+    ) +
+    # Agregar puntos
+    geom_point(
+      data = datos_plot,
+      aes(x = Año, y = valor),
+      color = "black",
+      size = 3
+    ) +
+    # Agregar etiquetas con color de gobierno como fondo
+    geom_label_repel(
+      data = datos_labels,
+      aes(x = Año, y = valor, label = sprintf("%.2f%%", valor), fill = Gobierno),
+      size = 5,
+      color = "black",
+      label.size = 0.3,
+      label.padding = unit(0.15, "lines"),
+      max.overlaps = 25,
+      segment.size = 0.3,
+      segment.color = "black",
+      segment.alpha = 0.7,
+      box.padding = 0.4,
+      point.padding = 0.3,
+      force_pull = 0,
+      direction = "y",
+      show.legend = FALSE
+    ) +
+    # Escalas de los ejes
+    scale_x_continuous(
+      breaks = seq(1993, 2026, by = 2),
+      limits = c(1992.5, 2026.5)
+    ) +
+    scale_y_continuous(
+      labels = function(x) paste0(x, "%"),
+      expand = expansion(mult = c(0.05, 0.15))
+    ) +
+    # Títulos y etiquetas
+    labs(
+      title = titulo,
+      subtitle = "Argentina 1993-2026 | Por período de gobierno",
+      x = "Año",
+      y = "Porcentaje del PBI",
+      caption = caption_text
+    ) +
+    # Aplicar tema
+    tema_profesional +
+    # Agregar etiquetas de gobierno en la parte superior (alternando posiciones y)
+    annotate(
+      "text",
+      x = c(1996.5, 2002.5, 2011.5, 2021.5),
+      y = Inf,
+      label = c("Menem", "Duhalde", "CFK", "Fernández"),
+      vjust = 2,
+      hjust = 0.5,
+      size = 4,
+      fontface = "bold",
+      color = "gray30"
+    ) +
+    annotate(
+      "text",
+      x = c(2000.5, 2005.5, 2017.5, 2025),
+      y = Inf,
+      label = c("De la Rúa", "Kirchner", "Macri", "Milei"),
+      vjust = 6,
+      hjust = 0.5,
+      size = 4,
+      fontface = "bold",
+      color = "gray30"
+    )
+  
+  # Guardar en PNG
+  ggsave(
+    paste0(filename_base, ".png"),
+    plot = p,
+    width = 12,
+    height = 12,
+    dpi = 300,
+    bg = "white"
   )
-
-# -----------------------------------------------------------------------------
-# 6b. Gráfico de EDUCACIÓN
-# -----------------------------------------------------------------------------
-
-datos_educacion <- presupuesto %>%
-  select(Año, Gobierno, Educacion_pct_PBI)
-
-p_educacion <- ggplot() +
-  # Agregar rectángulos de fondo para cada gobierno
-  geom_rect(
-    data = gobiernos_rect,
-    aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf, fill = Gobierno),
-    alpha = 0.3
-  ) +
-  scale_fill_manual(values = colores_gobierno, guide = "none") +
-  # Agregar líneas verticales entre gobiernos
-  geom_vline(
-    xintercept = c(1999.5, 2001.5, 2003.5, 2007.5, 2015.5, 2019.5, 2023.5),
-    linetype = "dashed",
-    color = "gray50",
-    alpha = 0.5
-  ) +
-  # Agregar línea de la serie temporal
-  geom_line(
-    data = datos_educacion,
-    aes(x = Año, y = Educacion_pct_PBI),
-    color = "#A23B72",
-    linewidth = 1.2
-  ) +
-  # Agregar puntos
-  geom_point(
-    data = datos_educacion,
-    aes(x = Año, y = Educacion_pct_PBI),
-    color = "#A23B72",
-    size = 4
-  ) +
-  # Agregar etiquetas con contorno blanco
-  geom_label_repel(
-    data = datos_educacion,
-    aes(x = Año, y = Educacion_pct_PBI, label = sprintf("%.2f%%", Educacion_pct_PBI)),
-    size = 5,
-    color = "#A23B72",
-    fill = "white",
-    label.size = 0.2,
-    label.padding = unit(0.15, "lines"),
-    max.overlaps = 25,
-    segment.size = 0.3,
-    segment.alpha = 0.5,
-    box.padding = 0.4,
-    point.padding = 0.3,
-    force_pull = 0,
-    direction = "y"
-  ) +
-  # Escalas de los ejes
-  scale_x_continuous(
-    breaks = seq(1993, 2026, by = 2),
-    limits = c(1992.5, 2026.5)
-  ) +
-  scale_y_continuous(
-    labels = function(x) paste0(x, "%"),
-    expand = expansion(mult = c(0.05, 0.15))
-  ) +
-  # Títulos y etiquetas
-  labs(
-    title = "Presupuesto Devengado en Educación como % del PBI",
-    subtitle = "Argentina 1993-2026 | Por período de gobierno",
-    x = "Año",
-    y = "Porcentaje del PBI",
-    caption = caption_text
-  ) +
-  # Aplicar tema
-  tema_profesional +
-  # Agregar etiquetas de gobierno en la parte superior (alternando posiciones y)
-  annotate(
-    "text",
-    x = c(1996, 2002, 2011, 2021),
-    y = Inf,
-    label = c("Menem", "Duhalde", "CFK", "Fernández"),
-    vjust = 2,
-    hjust=0.5,
-    size = 4,
-    fontface = "bold",
-    color = "gray30"
-  ) +
-  annotate(
-    "text",
-    x = c(2000, 2005, 2017, 2024.5),
-    y = Inf,
-    label = c("De la Rúa", "Kirchner", "Macri", "Milei"),
-    vjust = 4,
-    hjust=0.5,
-    size = 4,
-    fontface = "bold",
-    color = "gray30"
+  
+  # Guardar en PDF
+  ggsave(
+    paste0(filename_base, ".pdf"),
+    plot = p,
+    width = 12,
+    height = 12,
+    bg = "white"
   )
+  
+  return(p)
+}
 
 # -----------------------------------------------------------------------------
-# 7. Guardar los gráficos
+# 7. Crear y guardar los gráficos
 # -----------------------------------------------------------------------------
 
-# Guardar gráfico de CIENCIA en PNG de alta resolución
-ggsave(
-  "presupuesto_ciencia_pbi.png",
-  plot = p_ciencia,
-  width = 12,
-  height = 12,
-  dpi = 300,
-  bg = "white"
+p_ciencia <- crear_grafico_pbi(
+  data = presupuesto,
+  variable = "Ciencia_pct_PBI",
+  titulo = "Presupuesto Devengado en Ciencia y Técnica como % del PBI",
+  filename_base = "presupuesto_ciencia_pbi"
 )
 
-# Guardar gráfico de CIENCIA en PDF para publicación
-ggsave(
-  "presupuesto_ciencia_pbi.pdf",
-  plot = p_ciencia,
-  width = 12,
-  height = 12,
-  bg = "white"
-)
-
-# Guardar gráfico de EDUCACIÓN en PNG de alta resolución
-ggsave(
-  "presupuesto_educacion_pbi.png",
-  plot = p_educacion,
-  width = 12,
-  height = 12,
-  dpi = 300,
-  bg = "white"
-)
-
-# Guardar gráfico de EDUCACIÓN en PDF para publicación
-ggsave(
-  "presupuesto_educacion_pbi.pdf",
-  plot = p_educacion,
-  width = 12,
-  height = 12,
-  bg = "white"
+p_educacion <- crear_grafico_pbi(
+  data = presupuesto,
+  variable = "Educacion_pct_PBI",
+  titulo = "Presupuesto Devengado en Educación como % del PBI",
+  filename_base = "presupuesto_educacion_pbi"
 )
 
 # Mostrar los gráficos
