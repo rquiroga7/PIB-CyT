@@ -26,7 +26,8 @@ definir_gobierno <- function(año) {
 # -----------------------------------------------------------------------------
 
 crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zero = FALSE,
-                               gobiernos_rect, colores_gobierno, caption_text, tema_profesional) {
+                               gobiernos_rect, colores_gobierno, caption_text, tema_profesional,
+                               subtitulo = "Argentina 1993-2026 | Por período de gobierno") {
   # Preparar datos
   datos_plot <- data %>%
     select(Año, Gobierno, valor = all_of(variable))
@@ -93,7 +94,7 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zer
     # Títulos y etiquetas
     labs(
       title = titulo,
-      subtitle = "Argentina 1993-2026 | Por período de gobierno",
+      subtitle = subtitulo,
       x = "Año",
       y = "Porcentaje del PBI",
       caption = caption_text
@@ -156,7 +157,8 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zer
 # -----------------------------------------------------------------------------
 
 crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base,
-                                      colores_gobierno, caption_text, tema_profesional) {
+                                      colores_gobierno, caption_text, tema_profesional,
+                                      subtitulo = "Argentina 1993-2026 | Por período de gobierno") {
   # Preparar datos
   datos_plot <- data %>%
     select(Año, Gobierno, valor = all_of(variable))
@@ -245,7 +247,7 @@ crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base,
     # Títulos y etiquetas
     labs(
       title = titulo,
-      subtitle = "Argentina 1993-2026 | Por período de gobierno",
+      subtitle = subtitulo,
       x = "Año",
       y = "Porcentaje del PBI",
       caption = caption_text
@@ -271,7 +273,8 @@ crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base,
 # -----------------------------------------------------------------------------
 
 crear_grafico_variacion_pbi <- function(data, variable, titulo, filename_base,
-                                         colores_gobierno, caption_text, tema_profesional) {
+                                         colores_gobierno, caption_text, tema_profesional,
+                                         subtitulo = "Argentina 1994-2026 | Variación interanual en puntos porcentuales del PBI") {
   # Preparar datos y calcular variación interanual
   datos_plot <- data %>%
     select(Año, Gobierno, valor = all_of(variable)) %>%
@@ -347,7 +350,7 @@ crear_grafico_variacion_pbi <- function(data, variable, titulo, filename_base,
     # Títulos y etiquetas
     labs(
       title = titulo,
-      subtitle = "Argentina 1994-2026 | Variación interanual en puntos porcentuales del PBI",
+      subtitle = subtitulo,
       x = "Año",
       y = "Variación interanual (puntos porcentuales)",
       caption = caption_text

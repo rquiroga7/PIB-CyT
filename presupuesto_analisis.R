@@ -87,7 +87,7 @@ colores_gobierno <- c(
 gobiernos_rect <- presupuesto %>%
   group_by(Gobierno) %>%
   summarise(
-    xmin = ifelse(Gobierno=="Menem\n(1989-1999)", min(Año), min(Año)-.8),
+    xmin = ifelse(cur_group()$Gobierno=="Menem\n(1989-1999)", min(Año), min(Año)-.8),
     xmax = max(Año)+.2,
     .groups = "drop"
   ) %>%
