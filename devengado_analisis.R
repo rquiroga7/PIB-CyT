@@ -136,7 +136,7 @@ pbi_mensual_viejo <- presupuesto %>%
 
 pbi_mensual <- bind_rows(pbi_mensual_viejo, pbi_mensual)
 
-# 2026: aún no hay datos trimestrales; se usa el PBI anual del Presupuesto 2026 / 12.
+# 2026: aún no hay datos trimestrales; se usa el PBI anual estimado en el Proyecto de Presupuesto 2027 / 12.
 pbi_mensual <- bind_rows(
   pbi_mensual,
   data.frame(anio = 2026, mes = 1:12,

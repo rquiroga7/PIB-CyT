@@ -27,7 +27,7 @@ definir_gobierno <- function(año) {
 
 crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zero = FALSE,
                                gobiernos_rect, colores_gobierno, caption_text, tema_profesional,
-                               subtitulo = "Argentina 1993-2026 | Por período de gobierno") {
+                                      subtitulo = "Argentina 1993-2027 | Por período de gobierno") {
   # Preparar datos
   datos_plot <- data %>%
     select(Año, Gobierno, valor = all_of(variable))
@@ -88,8 +88,8 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zer
     ) +
     # Escalas de los ejes
     scale_x_continuous(
-      breaks = seq(1993, 2026, by = 2),
-      limits = c(1992.5, 2026.5)
+      breaks = seq(1993, 2027, by = 2),
+      limits = c(1992.5, 2027.5)
     ) +
     # Títulos y etiquetas
     labs(
@@ -158,7 +158,7 @@ crear_grafico_pbi <- function(data, variable, titulo, filename_base, start_y_zer
 
 crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base,
                                       colores_gobierno, caption_text, tema_profesional,
-                                      subtitulo = "Argentina 1993-2026 | Por período de gobierno") {
+                               subtitulo = "Argentina 1993-2027 | Por período de gobierno") {
   # Preparar datos
   datos_plot <- data %>%
     select(Año, Gobierno, valor = all_of(variable))
@@ -236,8 +236,8 @@ crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base,
     ) +
     # Escalas de los ejes
     scale_x_continuous(
-      breaks = seq(1993, 2026, by = 1),
-      limits = c(1992.5, 2026.5)
+      breaks = seq(1993, 2027, by = 1),
+      limits = c(1992.5, 2027.5)
     ) +
     scale_y_continuous(
       labels = function(x) paste0(x, "%"),
@@ -274,7 +274,7 @@ crear_grafico_barras_pbi <- function(data, variable, titulo, filename_base,
 
 crear_grafico_variacion_pbi <- function(data, variable, titulo, filename_base,
                                          colores_gobierno, caption_text, tema_profesional,
-                                         subtitulo = "Argentina 1994-2026 | Variación interanual en puntos porcentuales del PBI") {
+                                         subtitulo = "Argentina 1994-2027 | Variación interanual en puntos porcentuales del PBI") {
   # Preparar datos y calcular variación interanual
   datos_plot <- data %>%
     select(Año, Gobierno, valor = all_of(variable)) %>%
@@ -340,8 +340,8 @@ crear_grafico_variacion_pbi <- function(data, variable, titulo, filename_base,
     ) +
     # Escalas de los ejes
     scale_x_continuous(
-      breaks = seq(1994, 2026, by = 1),
-      limits = c(1993.5, 2026.5)
+      breaks = seq(1994, 2027, by = 1),
+      limits = c(1993.5, 2027.5)
     ) +
     scale_y_continuous(
       labels = function(x) paste0(ifelse(x > 0, "+", ""), sprintf("%.2f", x), " pp"),

@@ -122,8 +122,8 @@ caption_text <- paste0(
   "Fuentes: Presupuesto histórico (economia.gob.ar/onp/documentos/series/Serie6506.pdf) | ",
   "PBI 1993-2004 (INDEC, cuadro8_1.xls)\nPBI 2004-2025 (INDEC, sh_oferta_demanda_12_25.xls) | ",
   "Devengados (presupuestoabierto.gob.ar/sici/datos-abiertos)\n",
-  "PBI 2025-2026: estimaciones del Presupuesto Nacional 2026 | ",
-  "Para 2026 se usa el presupuesto como estimación proyectada del devengado.\n",
+  "PBI 2025: Presupuesto Nacional 2026 | PBI 2026-2027: Proyecto de Presupuesto 2027\n",
+  "Para 2026-2027 se usa el presupuesto como estimación proyectada del devengado.\n",
   "Gráfico: Rodrigo Quiroga | Repositorio: github.com/rquiroga7/PIB-CyT"
 )
 
@@ -246,7 +246,7 @@ resumen <- presupuesto %>%
     Educacion_pct_PBI = round(Educacion_pct_PBI, 4)
   )
 
-print(resumen, n = nrow(resumen))
+print(as.data.frame(resumen), row.names = FALSE)
 
 cat("\n=== Promedio por Gobierno ===\n\n")
 
@@ -259,4 +259,4 @@ promedio_gobierno <- presupuesto %>%
     .groups = "drop"
   )
 
-print(promedio_gobierno)
+print(as.data.frame(promedio_gobierno), row.names = FALSE)
